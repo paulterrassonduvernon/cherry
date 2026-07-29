@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS spaces (
 CREATE TABLE IF NOT EXISTS entries (
   id        TEXT PRIMARY KEY,
   space_id  TEXT NOT NULL REFERENCES spaces(id),
-  type      TEXT NOT NULL CHECK (type IN ('action', 'réflexion', 'conviction', 'idée')),
+  type      TEXT NOT NULL CHECK (type IN ('action', 'réflexion', 'conviction', 'idée', 'insight')),
   source    TEXT NOT NULL CHECK (source IN ('voice', 'text')),
   date      TEXT NOT NULL,
   file_path TEXT NOT NULL UNIQUE,

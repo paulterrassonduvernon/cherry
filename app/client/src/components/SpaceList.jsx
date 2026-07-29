@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSpaces } from "../contexts/SpacesContext.jsx";
 import { createSpace } from "../api.js";
+import QuickCapture from "./QuickCapture.jsx";
 
 export default function SpaceList() {
   const { spaces, loading, error, refresh } = useSpaces();
@@ -27,19 +28,25 @@ export default function SpaceList() {
 
   return (
     <div>
+      <h2>Nouvelle note</h2>
+      <QuickCapture />
+
       <h2>Espaces</h2>
 
-      <form onSubmit={handleCreate} className="new-space-form">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nouvel espace (ex: Carrière)"
-        />
-        <button type="submit" disabled={creating || !name.trim()}>
-          Créer
-        </button>
-      </form>
-      {formError && <p className="error">{formError}</p>}
+      <details className="new-space-details">
+        <summary>Créer un espace vide (sans note)</summary>
+        <form onSubmit={handleCreate} className="new-space-form">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nouvel espace (ex: Carrière)"
+          />
+          <button type="submit" disabled={creating || !name.trim()}>
+            Créer
+          </button>
+        </form>
+        {formError && <p className="error">{formError}</p>}
+      </details>
 
       {loading && <p className="muted">Chargement...</p>}
       {error && <p className="error">{error}</p>}

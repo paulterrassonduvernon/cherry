@@ -10,7 +10,17 @@ let db;
 export function getDb() {
   if (!db) {
     fs.mkdirSync(config.dataDir, { recursive: true });
-    db = new Database(path.join(config.dataDir, "index.sqlite"));
+    const dbPath = path.join(config.dataDir, "index.sqlite");
+    // Start every boot from a clean file rather than reusing whatever is on
+    // disk: the index is documented as fully disposable/regenerated at every
+    // startup (see rebuildIndex below), so this also means a schema change
+    // (e.g. a new entry type added to the CHECK constraint) always takes
+    // effect — "CREATE TABLE IF NOT EXISTS" would otherwise silently keep
+    // stale tables/constraints from a previous run.
+    for (const suffix of ["", "-wal", "-shm"]) {
+      fs.rmSync(`${dbPath}${suffix}`, { force: true });
+    }
+    db = new Database(dbPath);
     db.pragma("journal_mode = WAL");
     db.exec(fs.readFileSync(schemaPath, "utf-8"));
   }

@@ -85,6 +85,12 @@ Le détail est commenté directement dans le fichier `schema.sql`.
 - **Installation de whisper.cpp** : `npm run setup:whisper` (`scripts/setup-whisper.sh`) clone + compile whisper.cpp dans `vendor/whisper.cpp` (gitignored, jamais commité — binaire spécifique à la machine) et télécharge le modèle choisi. Les chemins par défaut dans `config.js` pointent vers ce dossier ; `WHISPER_BINARY_PATH`/`WHISPER_MODEL_PATH` permettent de pointer ailleurs (ex : install Homebrew).
 - **Erreurs traitées comme des états, pas des crashs** (§11 du cahier des charges) : clé Claude manquante, Ollama injoignable, binaire/modèle whisper absent, ffmpeg en échec → toujours une erreur HTTP explicite affichée dans l'UI, jamais un blocage de la capture texte. La zone de texte reste éditable même après un échec de transcription.
 
+## Ajustements produit (post-Phase 4)
+
+- **Tag `insight`** ajouté à la liste fermée des types (`lib/constants.js` + `CHECK` de `schema.sql`).
+- **Index SQLite recréé à chaque démarrage** (pas seulement les lignes) : `db/index.js` supprime `index.sqlite`/`-wal`/`-shm` avant d'ouvrir la connexion, pour qu'un changement de schéma (comme l'ajout d'`insight`) s'applique toujours automatiquement — `CREATE TABLE IF NOT EXISTS` gardait sinon silencieusement l'ancienne contrainte.
+- **Capture sans friction** : `QuickCapture` (écran d'accueil) inverse l'ordre — on écrit/dicte la note d'abord, puis on choisit (ou crée à la volée) l'espace dans un menu déroulant, sans jamais avoir à naviguer dans une catégorie au préalable. Accessible en un clic depuis n'importe où via le lien "Tous les espaces". La logique d'enregistrement micro (`hooks/useVoiceCapture.js`) et le bouton micro (`VoiceCaptureButton.jsx`) sont désormais partagés entre ce composant et le formulaire de capture intra-espace.
+
 ## Ce qui n'est pas encore fait (volontairement)
 
 - Pas de vue transversale, recherche full-text, renommage/archivage d'espace depuis l'UI, corbeille consultable, écran paramètres (choix du fournisseur de synthèse, taille whisper, thème... actuellement tout se configure via `.env`), ni de bascule clair/sombre manuelle — Phase 5.

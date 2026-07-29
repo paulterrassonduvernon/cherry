@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { createEntry, transcribeAudio } from "../api.js";
+import { useEffect, useState } from "react";
+import { createEntry } from "../api.js";
+import { useVoiceCapture } from "../hooks/useVoiceCapture.js";
+import VoiceCaptureButton from "./VoiceCaptureButton.jsx";
 
 export default function CaptureForm({ spaceId, entryTypes, onCreated }) {
   const [content, setContent] = useState("");
@@ -8,21 +10,14 @@ export default function CaptureForm({ spaceId, entryTypes, onCreated }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const [recording, setRecording] = useState(false);
-  const [transcribing, setTranscribing] = useState(false);
-  const [voiceError, setVoiceError] = useState(null);
-  const mediaRecorderRef = useRef(null);
-  const chunksRef = useRef([]);
+  const { recording, transcribing, voiceError, startRecording, stopRecording } = useVoiceCapture((text) => {
+    setContent((prev) => (prev ? `${prev}\n${text}` : text));
+    setSource("voice");
+  });
 
   useEffect(() => {
     if (!type && entryTypes.length) setType(entryTypes[0]);
   }, [entryTypes, type]);
-
-  useEffect(() => {
-    return () => {
-      mediaRecorderRef.current?.stream?.getTracks().forEach((track) => track.stop());
-    };
-  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -39,45 +34,6 @@ export default function CaptureForm({ spaceId, entryTypes, onCreated }) {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  async function startRecording() {
-    setVoiceError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      chunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach((track) => track.stop());
-        const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType || "audio/webm" });
-        setTranscribing(true);
-        try {
-          const text = await transcribeAudio(blob);
-          setContent((prev) => (prev ? `${prev}\n${text}` : text));
-          setSource("voice");
-        } catch (err) {
-          setVoiceError(`${err.message} Tu peux saisir le texte manuellement en attendant.`);
-        } finally {
-          setTranscribing(false);
-        }
-      };
-
-      mediaRecorder.start();
-      mediaRecorderRef.current = mediaRecorder;
-      setRecording(true);
-    } catch (err) {
-      setVoiceError(`Impossible d'accéder au micro : ${err.message}`);
-    }
-  }
-
-  function stopRecording() {
-    mediaRecorderRef.current?.stop();
-    setRecording(false);
   }
 
   return (
@@ -99,15 +55,12 @@ export default function CaptureForm({ spaceId, entryTypes, onCreated }) {
             </option>
           ))}
         </select>
-        <button
-          type="button"
-          className={`mic-button${recording ? " recording" : ""}`}
-          onClick={recording ? stopRecording : startRecording}
-          disabled={transcribing}
-          title={recording ? "Arrêter l'enregistrement" : "Capture vocale"}
-        >
-          {recording ? "⏹" : "🎙"}
-        </button>
+        <VoiceCaptureButton
+          recording={recording}
+          transcribing={transcribing}
+          onStart={startRecording}
+          onStop={stopRecording}
+        />
         <button type="submit" disabled={submitting || !content.trim()}>
           Enregistrer
         </button>

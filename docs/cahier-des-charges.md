@@ -10,7 +10,7 @@ Problème central : absence d'un outil pensé pour capturer des idées à la vol
 
 ## 2. Vision produit
 
-Une app de capture rapide, organisée par espaces thématiques définis par l'utilisateur (ex: Carrière, Startup, Santé, Perso), dans laquelle chaque note est classée par type (action / réflexion / conviction / idée). Chaque espace expose :
+Une app de capture rapide, organisée par espaces thématiques définis par l'utilisateur (ex: Carrière, Startup, Santé, Perso), dans laquelle chaque note est classée par type (action / réflexion / conviction / idée / insight). Chaque espace expose :
 
 - une synthèse "du moment", régénérée périodiquement, qui résume l'état actuel de la réflexion sur ce sujet ;
 - une archive chronologique complète de toutes les entrées brutes, jamais supprimée ni perdue (zéro perte de contexte — la synthèse est une vue, pas un remplacement).
@@ -38,6 +38,7 @@ En complément, une vue transversale permet de filtrer/consulter toutes les entr
 - `réflexion`
 - `conviction`
 - `idée`
+- `insight`
 
 ### 4.3 Espaces
 

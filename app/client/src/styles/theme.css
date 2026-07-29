@@ -150,14 +150,43 @@ textarea {
   resize: vertical;
 }
 
+.new-space-details {
+  margin-bottom: 1.5rem;
+}
+
+.new-space-details summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
 .new-space-form {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
 }
 
 .new-space-form input {
   flex: 1;
+}
+
+.quick-capture {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quick-capture .capture-actions {
+  flex-wrap: wrap;
+}
+
+.quick-capture .capture-actions select {
+  flex: 1;
+  min-width: 120px;
 }
 
 .space-grid {

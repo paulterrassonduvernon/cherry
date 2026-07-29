@@ -8,9 +8,9 @@ Le repo est scaffoldé en une fois, mais l'implémentation se fera par étapes p
 
 1. **Phase 1 — Socle** ✅ : structure de repo, serveur Express minimal, client React/Vite minimal, schéma SQLite, gitignore/env/licence/README. Aucune logique métier.
 2. **Phase 2 — Cœur fonctionnel** ✅ : espaces (créer/lister/consulter), capture texte, stockage Markdown, index SQLite régénéré à chaque écriture, archive chronologique, édition et suppression (corbeille) d'entrées, écrans 1 et 2 branchés sur l'API. Pas de vocal ni d'IA — la synthèse affiche un message d'attente.
-3. **Phase 3 — Capture vocale** : enregistrement audio navigateur + transcription locale (whisper.cpp).
-4. **Phase 4 — IA** : auto-tagging + synthèse via l'API Claude, historique des synthèses, cron hebdomadaire.
-5. **Phase 5 — Compléments** : vue transversale, recherche full-text, corbeille, paramètres, thèmes clair/sombre, archivage d'espace.
+3. **Phase 3 — Capture vocale** ✅ : enregistrement audio navigateur (MediaRecorder) + transcription locale (whisper.cpp en sous-processus, audio converti via ffmpeg). Repli sur la saisie manuelle si la transcription échoue.
+4. **Phase 4 — IA** ✅ : synthèse via un fournisseur interchangeable (API Claude *ou* Ollama en local), historique versionné des synthèses, resynthétisation manuelle + cron automatique.
+5. **Phase 5 — Compléments** : vue transversale, recherche full-text, corbeille consultable depuis l'UI, écran paramètres, renommage/archivage d'espace depuis l'UI, bascule clair/sombre manuelle.
 
 ## Structure de repo
 
@@ -76,10 +76,17 @@ Le détail est commenté directement dans le fichier `schema.sql`.
 - **API REST** : `GET/POST /api/spaces`, `GET/PATCH /api/spaces/:id`, `GET/POST /api/entries` (création + liste filtrée par `?spaceId=`), `GET/PATCH/DELETE /api/entries/:id`, `GET /api/entry-types` (source unique de vérité pour la liste fermée de tags, partagée par le formulaire de capture).
 - **Frontend** : contexte React `SpacesProvider` partagé par la sidebar et l'écran d'accueil ; chaque écran garde un compteur de requête (`requestIdRef`) pour ignorer une réponse réseau arrivée en retard et éviter d'écraser un état plus récent par un état périmé.
 
+## Implémentation Phase 3 (voix) & Phase 4 (IA)
+
+- **Fournisseur de synthèse interchangeable** : `services/synthesis-providers/{claude,ollama}.js`, choisi via `SYNTHESIS_PROVIDER` (`.env`). Les deux exposent la même fonction `generate({ systemPrompt, userPrompt })` — `services/synthesis-providers/index.js` fait le dispatch. Claude passe par `@anthropic-ai/sdk` ; Ollama appelle `POST {OLLAMA_BASE_URL}/api/chat` en HTTP local, sans SDK.
+- **Synthèse = fichier Markdown versionné** : `services/synthesis.js` construit le prompt à partir de l'historique chronologique des entrées (`listEntries` inversé), écrit un fichier horodaté dans `data/spaces/{id}/synthesis/` **et** une copie dans `current.md` (pointeur). Rien n'écrase une version précédente — l'historique complet reste consultable via `GET /api/spaces/:id/synthesis`.
+- **Cron** : `services/cron.js` planifie `generateSynthesis()` pour chaque espace non-archivé et non-vide, selon `SYNTHESIS_CRON` (`node-cron`, hebdo par défaut). Une erreur sur un espace (ex : Ollama éteint) n'interrompt pas les autres.
+- **Voix → texte, 100% local** : le micro est capturé côté navigateur (`MediaRecorder`), l'audio est envoyé tel quel au serveur (`POST /api/transcribe`, corps brut), converti en WAV 16kHz mono par `ffmpeg`, puis transcrit par un sous-processus `whisper-cli` (`services/transcription.js`). Aucun octet audio ne transite par un service tiers.
+- **Installation de whisper.cpp** : `npm run setup:whisper` (`scripts/setup-whisper.sh`) clone + compile whisper.cpp dans `vendor/whisper.cpp` (gitignored, jamais commité — binaire spécifique à la machine) et télécharge le modèle choisi. Les chemins par défaut dans `config.js` pointent vers ce dossier ; `WHISPER_BINARY_PATH`/`WHISPER_MODEL_PATH` permettent de pointer ailleurs (ex : install Homebrew).
+- **Erreurs traitées comme des états, pas des crashs** (§11 du cahier des charges) : clé Claude manquante, Ollama injoignable, binaire/modèle whisper absent, ffmpeg en échec → toujours une erreur HTTP explicite affichée dans l'UI, jamais un blocage de la capture texte. La zone de texte reste éditable même après un échec de transcription.
+
 ## Ce qui n'est pas encore fait (volontairement)
 
-- Pas de capture vocale ni de whisper.cpp — Phase 3.
-- Pas d'auto-tagging ni de synthèse IA (l'écran d'espace affiche un message d'attente à la place) ni de cron — Phase 4.
-- Pas de vue transversale, recherche full-text, renommage/archivage d'espace depuis l'UI, corbeille consultable, écran paramètres, ni de bascule clair/sombre manuelle — Phase 5.
+- Pas de vue transversale, recherche full-text, renommage/archivage d'espace depuis l'UI, corbeille consultable, écran paramètres (choix du fournisseur de synthèse, taille whisper, thème... actuellement tout se configure via `.env`), ni de bascule clair/sombre manuelle — Phase 5.
 
 Ce document sera mis à jour à chaque phase pour rester le reflet de l'état réel du code.

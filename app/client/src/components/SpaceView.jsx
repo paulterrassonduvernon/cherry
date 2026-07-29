@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getSpace, getEntries, getEntryTypes } from "../api.js";
+import { getSpace, getEntries, getEntryTypes, getSynthesis } from "../api.js";
 import { useSpaces } from "../contexts/SpacesContext.jsx";
 import CaptureForm from "./CaptureForm.jsx";
 import EntryItem from "./EntryItem.jsx";
+import SynthesisBox from "./SynthesisBox.jsx";
 
 export default function SpaceView() {
   const { id } = useParams();
@@ -11,6 +12,7 @@ export default function SpaceView() {
   const [space, setSpace] = useState(null);
   const [entries, setEntries] = useState([]);
   const [entryTypes, setEntryTypes] = useState([]);
+  const [synthesis, setSynthesis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   // Guards against out-of-order responses: two loads can overlap (e.g. a
@@ -24,15 +26,17 @@ export default function SpaceView() {
     setLoading(true);
     setError(null);
     try {
-      const [spaceData, entriesData, types] = await Promise.all([
+      const [spaceData, entriesData, types, synthesisData] = await Promise.all([
         getSpace(id),
         getEntries(id),
         getEntryTypes(),
+        getSynthesis(id),
       ]);
       if (requestIdRef.current !== requestId) return;
       setSpace(spaceData);
       setEntries(entriesData);
       setEntryTypes(types);
+      setSynthesis(synthesisData);
     } catch (err) {
       if (requestIdRef.current !== requestId) return;
       setError(err.message);
@@ -60,12 +64,12 @@ export default function SpaceView() {
       </Link>
       <h2>{space.name}</h2>
 
-      <section className="synthesis-box">
-        <h3>Synthèse du moment</h3>
-        <p className="muted">
-          Synthèse indisponible pour l'instant — arrivera en Phase 4 (API Claude).
-        </p>
-      </section>
+      <SynthesisBox
+        spaceId={id}
+        synthesis={synthesis}
+        hasEntries={entries.length > 0}
+        onRegenerated={handleChanged}
+      />
 
       <CaptureForm spaceId={id} entryTypes={entryTypes} onCreated={handleChanged} />
 

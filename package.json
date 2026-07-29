@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "concurrently -n server,client -c blue,magenta \"npm run dev --workspace=app/server\" \"npm run dev --workspace=app/client\"",
     "dev:server": "npm run dev --workspace=app/server",
-    "dev:client": "npm run dev --workspace=app/client"
+    "dev:client": "npm run dev --workspace=app/client",
+    "setup:whisper": "bash scripts/setup-whisper.sh"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

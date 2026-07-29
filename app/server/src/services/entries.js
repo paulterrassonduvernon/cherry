@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import { config } from "../config.js";
 import { ENTRY_TYPES, ENTRY_SOURCES } from "../lib/constants.js";
 import { entriesDir, trashEntriesDir } from "../lib/paths.js";
+import { timestampFilename } from "../lib/timestamp.js";
 import { spaceExistsOnDisk } from "./spaces.js";
 import { getDb } from "../db/index.js";
 
@@ -23,15 +24,6 @@ function assertValidType(type) {
   if (!ENTRY_TYPES.includes(type)) {
     throw httpError(400, `Type invalide. Valeurs autorisées : ${ENTRY_TYPES.join(", ")}`);
   }
-}
-
-function timestampFilename(date) {
-  const pad = (n, len = 2) => String(n).padStart(len, "0");
-  return (
-    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
-    `-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}` +
-    `-${pad(date.getMilliseconds(), 3)}`
-  );
 }
 
 function toEntryId(spaceId, filenameBase) {

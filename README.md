@@ -9,31 +9,56 @@ MVP pensé comme une app web locale (Mac), sans dépendance à un service tiers 
 
 ## État du projet
 
-En cours de construction, par phases (voir `docs/architecture.md`). À ce stade : squelette de repo uniquement (pas encore de fonctionnalité).
+En cours de construction, par phases (voir `docs/architecture.md`). À ce stade : espaces, capture texte/vocale, archive chronologique, et synthèse IA (Claude ou 100% locale via Ollama) sont fonctionnels. Reste à venir : vue transversale, recherche, écran paramètres.
 
 ## Confidentialité
 
 - Les notes (texte + audio) restent en local, dans `/data` (jamais versionné, jamais envoyé nulle part).
-- Seul le **texte transcrit** transite vers l'API Claude, pour l'auto-tagging et la synthèse — jamais l'audio brut.
-- La transcription vocale se fait 100% en local via Whisper (whisper.cpp), sans appel réseau.
+- La transcription vocale se fait 100% en local via whisper.cpp — l'audio brut ne quitte jamais la machine.
+- Pour la synthèse, deux options :
+  - **API Claude** : seul le **texte** (jamais l'audio) transite vers Anthropic.
+  - **Ollama en local** : rien ne quitte la machine, tout tourne sur un modèle installé localement.
 
 ## Stack
 
 - Backend : Node.js + Express
 - Frontend : React + Vite
 - Stockage : fichiers Markdown (source de vérité) + index SQLite régénérable (`better-sqlite3`)
-- Transcription vocale locale : whisper.cpp
-- Synthèse & auto-tagging : API Claude (`@anthropic-ai/sdk`)
+- Transcription vocale locale : whisper.cpp (sous-processus, converti via ffmpeg)
+- Synthèse : fournisseur interchangeable — API Claude (`@anthropic-ai/sdk`) ou Ollama en local (HTTP)
 
 ## Installation locale
 
-Prérequis : Node.js ≥ 20.
+Prérequis : Node.js ≥ 20, [ffmpeg](https://ffmpeg.org) (`brew install ffmpeg`).
 
 ```bash
 git clone <url-du-repo>
 cd cherry
-cp .env.example .env   # puis renseigne ta clé API Claude dans .env
+cp .env.example .env
 npm install
+```
+
+### Synthèse : Claude ou local (Ollama) ?
+
+Dans `.env`, choisis `SYNTHESIS_PROVIDER` :
+
+- `claude` (par défaut) : renseigne `ANTHROPIC_API_KEY`. Meilleure qualité, nécessite internet.
+- `ollama` : 100% local et privé. Installe [Ollama](https://ollama.com), lance `ollama pull llama3.1` puis `ollama serve`. Ajuste `OLLAMA_MODEL` si tu utilises un autre modèle.
+
+Tu peux changer d'avis à tout moment en changeant `SYNTHESIS_PROVIDER` (pas besoin de migrer quoi que ce soit — les synthèses déjà générées restent lisibles, chacune garde une trace de son fournisseur).
+
+### Capture vocale (whisper.cpp)
+
+```bash
+npm run setup:whisper            # clone + compile whisper.cpp, télécharge le modèle "base"
+npm run setup:whisper -- small    # ou une autre taille : tiny | base | small
+```
+
+Ce script installe whisper.cpp dans `vendor/whisper.cpp` (gitignored — binaire compilé localement, jamais commité). Si tu préfères une install existante (ex: Homebrew), renseigne `WHISPER_BINARY_PATH` et `WHISPER_MODEL_PATH` dans `.env` à la place.
+
+### Lancer l'app
+
+```bash
 npm run dev
 ```
 
@@ -45,6 +70,8 @@ Le serveur backend et le client frontend démarrent ensemble. L'app est accessib
 /app          # code source (backend Express + frontend React/Vite)
 /data         # tes notes (gitignored, jamais commité)
 /docs         # cahier des charges, architecture, captures d'écran
+/scripts      # setup-whisper.sh
+/vendor       # whisper.cpp cloné/compilé localement (gitignored)
 .env.example  # modèle de config sans clé réelle
 ```
 

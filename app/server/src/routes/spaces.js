@@ -1,6 +1,7 @@
 import { Router } from "express";
 import * as spaces from "../services/spaces.js";
 import { reindexAll } from "../services/reindex.js";
+import { generateSynthesis, getCurrentSynthesis, listSynthesisHistory } from "../services/synthesis.js";
 
 const router = Router();
 
@@ -37,6 +38,30 @@ router.patch("/:id", (req, res, next) => {
     if (archived !== undefined) spaces.setSpaceArchived(req.params.id, archived);
     reindexAll();
     res.json(spaces.getSpace(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:id/synthesis", (req, res, next) => {
+  try {
+    spaces.getSpace(req.params.id); // 404 if missing
+    res.json({
+      current: getCurrentSynthesis(req.params.id),
+      history: listSynthesisHistory(req.params.id),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/:id/synthesis", async (req, res, next) => {
+  try {
+    await generateSynthesis(req.params.id);
+    res.status(201).json({
+      current: getCurrentSynthesis(req.params.id),
+      history: listSynthesisHistory(req.params.id),
+    });
   } catch (err) {
     next(err);
   }

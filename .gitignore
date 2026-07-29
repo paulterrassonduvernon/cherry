@@ -25,6 +25,9 @@ app/client/dist/
 *.ggml
 whisper-models/
 
+# whisper.cpp source + build, cloned locally by scripts/setup-whisper.sh
+/vendor/
+
 # Logs
 *.log
 npm-debug.log*

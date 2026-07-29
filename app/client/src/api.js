@@ -25,3 +25,18 @@ export const createEntry = ({ spaceId, type, content, source }) =>
 export const updateEntry = (id, patch) =>
   request(`/entries/${id}`, { method: "PATCH", body: JSON.stringify(patch) });
 export const deleteEntry = (id) => request(`/entries/${id}`, { method: "DELETE" });
+
+export const getSynthesis = (spaceId) => request(`/spaces/${spaceId}/synthesis`);
+export const regenerateSynthesis = (spaceId) =>
+  request(`/spaces/${spaceId}/synthesis`, { method: "POST" });
+
+export async function transcribeAudio(blob) {
+  const res = await fetch("/api/transcribe", {
+    method: "POST",
+    headers: { "Content-Type": blob.type || "audio/webm" },
+    body: blob,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Erreur ${res.status}`);
+  return data.text;
+}

@@ -1,5 +1,6 @@
 :root {
   --accent: #7a1f2b; /* rouge foncé, à confirmer — cf. docs/cahier-des-charges.md §8 */
+  --accent-contrast: #ffffff;
 
   --bg: #f7f7f7;
   --bg-elevated: #ffffff;
@@ -31,4 +32,259 @@ body {
     sans-serif;
   background: var(--bg);
   color: var(--text);
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+}
+
+.brand {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.nav-link:hover {
+  background: var(--bg-elevated);
+}
+
+.nav-link.active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.nav-spaces {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 760px;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.error {
+  color: var(--accent);
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+button[type="submit"],
+.entry-actions button:first-child {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+button.danger {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: transparent;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.new-space-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.new-space-form input {
+  flex: 1;
+}
+
+.space-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.space-card {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  background: var(--bg-elevated);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.space-card:hover {
+  border-color: var(--accent);
+}
+
+.synthesis-preview {
+  font-style: italic;
+  margin-bottom: 0;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.synthesis-box {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-elevated);
+}
+
+.capture-form {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.capture-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.capture-actions select {
+  flex: 1;
+}
+
+.entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entry-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.entry-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: none;
+  border: none;
+  border-radius: 0;
+  text-align: left;
+}
+
+.entry-excerpt {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-date {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--border);
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.entry-detail {
+  padding: 0 0.9rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.entry-full-content {
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 0.5rem;
 }

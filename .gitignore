@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+
+# User data (notes are personal, never versioned with the code)
+/data/*
+!/data/spaces/
+!/data/trash/
+!/data/.gitkeep
+/data/spaces/*
+!/data/spaces/.gitkeep
+/data/trash/*
+!/data/trash/.gitkeep
+
+# Build outputs
+dist/
+build/
+app/client/dist/
+
+# Whisper models (downloaded locally, not versioned)
+*.bin
+*.ggml
+whisper-models/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,19 @@
+{
+  "name": "cherry",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Second-brain app for dynamic note-taking — local-first MVP.",
+  "license": "MIT",
+  "workspaces": [
+    "app/server",
+    "app/client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,magenta \"npm run dev --workspace=app/server\" \"npm run dev --workspace=app/client\"",
+    "dev:server": "npm run dev --workspace=app/server",
+    "dev:client": "npm run dev --workspace=app/client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

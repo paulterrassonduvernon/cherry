@@ -94,9 +94,20 @@ source: voice   # voice | text
 
 ## 7. Roadmap (post-MVP)
 
-- V2 : intégration Notion (push de synthèses/entrées) + Calendar (push des `action`).
+- V2 : intégration Notion (push de synthèses/entrées) + Calendar (push des `action`), précisé ci-dessous.
 - V2/V3 : app mobile iPhone + synchronisation Mac ↔ iPhone (mécanisme à définir : iCloud vs serveur perso).
 - Réévaluation possible : liens entre entrées, mode conversationnel, si le besoin se confirme à l'usage.
+
+### 7.1 Push Calendar par thématique (`action`)
+
+Pour chaque espace, créer un événement (ou une liste d'événements) dans Apple Calendar ou Google Calendar reprenant les `action` réfléchies récemment dans cet espace.
+
+- Google Calendar : API directe (OAuth), un event par thématique — la voie la plus simple.
+- Apple Calendar : pas d'API cloud publique ; passerait par EventKit en local (donc lié au packaging Electron du Mac) ou par export `.ics`. À trancher au moment de l'implémentation.
+
+### 7.2 Rapport mensuel automatisé → Notion
+
+Cron mensuel (en plus du cron hebdomadaire de synthèse déjà en place) qui génère, par espace, un rapport archivé dans une database Notion dédiée : une entrée par mois et par thématique, contenant (a) la liste brute de toutes les entrées ajoutées dans le mois et (b) une synthèse globale complète de la période. Techniquement proche du mécanisme de synthèse d'espace existant (même prompt-building, fenêtre mensuelle plutôt qu'hebdomadaire), avec en plus un push vers l'API Notion (une database par thématique).
 
 ## 8. Direction design / branding (intention, pas encore figée)
 

@@ -1,7 +1,13 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import path from "node:path";
 
 const repoRoot = path.resolve(import.meta.dirname, "../../../");
+
+// `npm run dev` (npm workspaces) runs this process with app/server as the
+// working directory, not the repo root — so the default `dotenv/config`
+// (which loads ".env" relative to process.cwd()) would silently miss the
+// root .env and fall back to every default below. Load it explicitly.
+dotenv.config({ path: path.join(repoRoot, ".env") });
 
 export const config = {
   port: Number(process.env.PORT) || 3001,

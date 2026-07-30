@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Markdown from "markdown-to-jsx";
 import { regenerateSynthesis } from "../api.js";
 
 export default function SynthesisBox({ spaceId, synthesis, hasEntries, onRegenerated }) {
@@ -43,7 +44,7 @@ export default function SynthesisBox({ spaceId, synthesis, hasEntries, onRegener
           <p className="muted synthesis-meta">
             Générée le {formatDateTime(current.generatedAt)} · {current.provider}
           </p>
-          <p className="synthesis-content">{current.content}</p>
+          <Markdown className="synthesis-content">{current.content}</Markdown>
         </>
       )}
 
@@ -61,7 +62,7 @@ export default function SynthesisBox({ spaceId, synthesis, hasEntries, onRegener
                   <p className="muted synthesis-meta">
                     {formatDateTime(version.generatedAt)} · {version.provider}
                   </p>
-                  <p className="synthesis-content">{version.content}</p>
+                  <Markdown className="synthesis-content">{version.content}</Markdown>
                 </li>
               ))}
             </ul>

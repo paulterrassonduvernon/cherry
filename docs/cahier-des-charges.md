@@ -109,6 +109,15 @@ Pour chaque espace, créer un événement (ou une liste d'événements) dans App
 
 Cron mensuel (en plus du cron hebdomadaire de synthèse déjà en place) qui génère, par espace, un rapport archivé dans une database Notion dédiée : une entrée par mois et par thématique, contenant (a) la liste brute de toutes les entrées ajoutées dans le mois et (b) une synthèse globale complète de la période. Techniquement proche du mécanisme de synthèse d'espace existant (même prompt-building, fenêtre mensuelle plutôt qu'hebdomadaire), avec en plus un push vers l'API Notion (une database par thématique).
 
+### 7.3 Offline-first (mobile & web) avec sync différée
+
+Contrainte pour la version mobile + cloud (§7, sync Mac ↔ iPhone) : sur mobile comme sur web, une capture faite hors-ligne doit rester en mémoire locale (jamais perdue) jusqu'au retour de la connexion, moment où elle est poussée vers le stockage cloud. Concrètement :
+
+- Chaque client (mobile ou web) garde une file d'attente locale des captures non encore synchronisées.
+- Au retour du réseau, la file se vide automatiquement vers le stockage cloud, sans action manuelle de l'utilisateur.
+- Ce comportement guide directement le choix du mécanisme de sync encore ouvert (iCloud/CloudKit vs serveur perso) : CloudKit gère cette logique de file d'attente offline nativement ; un serveur perso demanderait de la construire explicitement (write-ahead queue côté client + endpoint de sync idempotent côté serveur).
+- Sans objet pour le MVP actuel (web app locale sur Mac, aucun stockage cloud) : la capture n'a déjà aucune dépendance réseau, donc rien à mettre en file d'attente à ce stade.
+
 ## 8. Direction design / branding (intention, pas encore figée)
 
 - Nom : Cherry ou Strawberry (à trancher).

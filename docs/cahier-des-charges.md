@@ -118,6 +118,21 @@ Contrainte pour la version mobile + cloud (§7, sync Mac ↔ iPhone) : sur mobil
 - Ce comportement guide directement le choix du mécanisme de sync encore ouvert (iCloud/CloudKit vs serveur perso) : CloudKit gère cette logique de file d'attente offline nativement ; un serveur perso demanderait de la construire explicitement (write-ahead queue côté client + endpoint de sync idempotent côté serveur).
 - Sans objet pour le MVP actuel (web app locale sur Mac, aucun stockage cloud) : la capture n'a déjà aucune dépendance réseau, donc rien à mettre en file d'attente à ce stade.
 
+### 7.4 Test d'autres modèles de transcription (fin de développement)
+
+À tester une fois le MVP validé, en remplacement/complément de whisper.cpp : Whisper Large V3, Kimi-Audio, Parakeet TDT, Distil-Whisper, Moonshine.
+
+- Whisper Large V3 et Distil-Whisper sont directement compatibles whisper.cpp (juste un autre fichier `.bin` — aucun changement de code, uniquement `WHISPER_MODEL_PATH`).
+- Parakeet TDT, Moonshine et Kimi-Audio sont des architectures différentes qui ne tournent pas sur whisper.cpp ; chacune demande son propre runtime (ONNX Runtime, NeMo, etc.).
+- Référence directe : Handy (inspiration design, §8) résout déjà ce problème via ses libs `transcribe-cpp`/`transcribe-rs`, qui abstraient plusieurs moteurs (Whisper, Parakeet, Moonshine, SenseVoice...) derrière une interface commune — à étudier (voire réutiliser) le moment venu plutôt que de réinventer cette couche.
+
+### 7.5 Transcription en direct pendant l'enregistrement
+
+Idée pour fluidifier la capture vocale (Écran 3) : afficher le texte transcrit au fur et à mesure qu'on parle, éditable avant validation, plutôt que d'attendre la fin de l'enregistrement pour voir apparaître le texte d'un coup.
+
+- Faisable avec whisper.cpp, qui a un mode streaming dédié : découpage en tranches de ~2-3 secondes, texte affiché au fur et à mesure (pas mot par mot comme les API cloud, mais avec une mise à jour visible en continu).
+- Plus lourd que le flux actuel (enregistrer → arrêter → transcrire en un bloc) : demande de streamer l'audio en continu vers le serveur (WebSocket) et de gérer le recouvrement entre tranches pour que le texte affiché ne saute pas ou ne se duplique pas.
+
 ## 8. Direction design / branding (intention, pas encore figée)
 
 - Nom : Cherry ou Strawberry (à trancher).

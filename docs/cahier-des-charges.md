@@ -173,6 +173,7 @@ Idée pour fluidifier la capture vocale (Écran 3) : afficher le texte transcrit
 **Écran 5 — Paramètres**
 
 - Clé API Claude (saisie, stockée localement — voir §12 sécurité).
+- Choix du fournisseur de synthèse (Claude API / Ollama local) et, pour Ollama, choix du modèle parmi ceux déjà téléchargés + possibilité d'en télécharger un nouveau directement depuis Cherry (via l'API Ollama : liste des modèles installés + déclenchement d'un téléchargement, sans passer par la ligne de commande).
 - Choix du modèle Whisper local (taille : tiny/base/small — arbitrage vitesse/qualité).
 - Fréquence de la synthèse automatique (par défaut hebdo, modifiable).
 - Thème clair/sombre.
